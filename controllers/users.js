@@ -1,36 +1,60 @@
 const { response } = require("express")
+const bcryptjs = require('bcryptjs');
 
-const getUsers = (req, res = response) => {
+const User = require('../models/user');
 
-    const { limit = 5, from = 1 } = req.query;
+const getUsers = async(req, res = response) => {
+
+    const users = await User.find();
 
     res.json({
-        query
-    })
+        users
+    });
 }
 
-const createUser = (req, res = response) => {
+const createUser = async(req, res = response) => {
 
-    const body = req.body;
+    const name = req.body.name.toLowerCase();
+    const rol = req.body.rol.toLowerCase();
+    
+    const { email, password, surname } = req.body;
 
-    res.json({
-        body
-    })
+    const user = new User({ name, email, password, rol, surname });
+
+    const salt = bcryptjs.genSaltSync();
+    user.password = bcryptjs.hashSync(password, salt);
+    
+    await user.save();
+    
+    res.json(user);
 }
 
-const updateUser = (req, res = response) => {
+const updateUser = async(req, res = response) => {
 
-    const id = req.params.id;
+    const { id } = req.params;
+    const { _id, password, google, email, ...rest } = req.body;
+
+    if ( password ) {
+        const salt = bcryptjs.genSaltSync();
+        rest.password = bcryptjs.hashSync(password, salt);
+    }
+
+    const user = await User.findByIdAndUpdate(id, rest, { new: true });
 
     res.json({
-        id
-    })
+        user
+    });
 }
 
-const deleteUser = (req, res = response) => {
+const deleteUser = async(req, res = response) => {
+
+    const { id } = req.params;
+
+    const user = await User.findByIdAndUpdate(id, {state: false}, {new: true});
+
     res.json({
-        msg: 'DELETE'
-    })
+        user
+    });
 }
 
 module.exports = {

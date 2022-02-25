@@ -1,4 +1,11 @@
 const { Router } = require('express');
+const { check } = require('express-validator');
+
+const { isValidRole,
+        validEmail,
+        validateUserByID } = require('../helpers/db-validators');
+const { validateFields } = require('../middlewares/validate-fields');
+
 const { getUsers,
         createUser,
         updateUser,
@@ -6,12 +13,29 @@ const { getUsers,
 
 const router = Router();
 
-router.get('/', getUsers )
+router.get('/', getUsers );
 
-router.post('/', createUser )
+router.post('/', [
+    check('name', 'Name is requerid').not().isEmpty(),
+    check('email', 'Email is requerid').not().isEmpty(),
+    check('email').custom( validEmail ),
+    check('email', 'Invalid email').isEmail(),
+    check('password', 'The password must contain at least 6 digits').isLength({ min: 6 }),
+    check('rol').custom( isValidRole ),
+    validateFields
+], createUser );
 
-router.put('/:id', updateUser )
+router.put('/:id', [
+    check('id', 'Invalid ID').isMongoId(),
+    check('id').custom( validateUserByID ),
+    check('rol').custom( isValidRole ),
+    validateFields
+], updateUser );
 
-router.delete('/:id', deleteUser )
+router.delete('/:id', [
+    check('id', 'Invalid ID').isMongoId(),
+    check('id').custom( validateUserByID ),
+    validateFields
+], deleteUser );
 
 module.exports = router;
