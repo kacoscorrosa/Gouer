@@ -3,7 +3,8 @@ const { check } = require('express-validator');
 
 const { isValidRole,
         validEmail,
-        validateUserByID } = require('../helpers/db-validators');
+        validateUserByID, 
+        validateStateByID} = require('../helpers/db-validators');
 const { validateFields } = require('../middlewares/validate-fields');
 
 const { getUsers,
@@ -28,6 +29,7 @@ router.post('/', [
 router.put('/:id', [
     check('id', 'Invalid ID').isMongoId(),
     check('id').custom( validateUserByID ),
+    check('id').custom( validateStateByID ),
     check('rol').custom( isValidRole ),
     validateFields
 ], updateUser );
@@ -35,6 +37,7 @@ router.put('/:id', [
 router.delete('/:id', [
     check('id', 'Invalid ID').isMongoId(),
     check('id').custom( validateUserByID ),
+    check('id').custom( validateStateByID ),
     validateFields
 ], deleteUser );
 

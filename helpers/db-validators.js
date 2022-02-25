@@ -24,10 +24,19 @@ const validateUserByID = async(id = '') =>  {
     if ( !existUserByID ) {
         throw new Error('Invalid ID');
     }
-}  
+}
+
+const validateStateByID = async(id = '') => {
+
+    const userActive = await User.findById( id );
+    if ( !userActive.state ) {
+        throw new Error('ID inactive');
+    }
+}
 
 module.exports = {
     isValidRole,
     validEmail,
-    validateUserByID
+    validateUserByID,
+    validateStateByID
 }
