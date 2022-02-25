@@ -14,10 +14,6 @@ const validEmail = async(email = '') => {
 
     const existEmail = await User.findOne({email});
     
-    if ( !existEmail.state ) {
-        throw new Error('Registered mail. idle state');
-    }
-    
     if (existEmail) {
         throw new Error('The email is already registered');
     }
