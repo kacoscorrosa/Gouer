@@ -13,6 +13,11 @@ const isValidRole = async(rol = '') => {
 const validEmail = async(email = '') => {
 
     const existEmail = await User.findOne({email});
+    
+    if ( !existEmail.state ) {
+        throw new Error('Registered mail. idle state');
+    }
+    
     if (existEmail) {
         throw new Error('The email is already registered');
     }
@@ -24,12 +29,8 @@ const validateUserByID = async(id = '') =>  {
     if ( !existUserByID ) {
         throw new Error('Invalid ID');
     }
-}
 
-const validateStateByID = async(id = '') => {
-
-    const userActive = await User.findById( id );
-    if ( !userActive.state ) {
+    if ( !existUserByID.state ) {
         throw new Error('ID inactive');
     }
 }
@@ -37,6 +38,5 @@ const validateStateByID = async(id = '') => {
 module.exports = {
     isValidRole,
     validEmail,
-    validateUserByID,
-    validateStateByID
+    validateUserByID
 }

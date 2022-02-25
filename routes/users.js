@@ -19,8 +19,8 @@ router.get('/', getUsers );
 router.post('/', [
     check('name', 'Name is requerid').not().isEmpty(),
     check('email', 'Email is requerid').not().isEmpty(),
-    check('email').custom( validEmail ),
     check('email', 'Invalid email').isEmail(),
+    check('email').custom( validEmail ),
     check('password', 'The password must contain at least 6 digits').isLength({ min: 6 }),
     check('rol').custom( isValidRole ),
     validateFields
@@ -29,7 +29,6 @@ router.post('/', [
 router.put('/:id', [
     check('id', 'Invalid ID').isMongoId(),
     check('id').custom( validateUserByID ),
-    check('id').custom( validateStateByID ),
     check('rol').custom( isValidRole ),
     validateFields
 ], updateUser );
@@ -37,7 +36,6 @@ router.put('/:id', [
 router.delete('/:id', [
     check('id', 'Invalid ID').isMongoId(),
     check('id').custom( validateUserByID ),
-    check('id').custom( validateStateByID ),
     validateFields
 ], deleteUser );
 
