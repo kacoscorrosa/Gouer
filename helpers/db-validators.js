@@ -25,10 +25,6 @@ const validateUserByID = async(id = '') =>  {
     if ( !existUserByID ) {
         throw new Error('Invalid ID');
     }
-
-    if ( !existUserByID.state ) {
-        throw new Error('ID inactive');
-    }
 }
 
 module.exports = {
