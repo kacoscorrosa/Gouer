@@ -52,7 +52,12 @@ const deleteUser = async(req, res = response) => {
 
     const user = await User.findByIdAndDelete( id );
 
-    res.json(user);
+    const userAuth = req.userAuth;
+
+    res.json({
+        user,
+        userAuth
+    });
 }
 
 module.exports = {
