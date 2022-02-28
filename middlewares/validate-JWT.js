@@ -29,7 +29,6 @@ const validateJWT = async( req, res = response, next ) => {
             msg: 'Invalid Token',
             error
         });
-
     }
 }
 
