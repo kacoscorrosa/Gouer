@@ -52,10 +52,16 @@ const deleteUser = async(req, res = response) => {
 
     const user = await User.findByIdAndDelete( id );
 
+    if ( !user ) {
+        return res.status(401).json({
+            msg: 'Invalid Token'
+        });
+    }
+
     const userAuth = req.userAuth;
 
     res.json({
-        user,
+        deletedUser: user,
         userAuth
     });
 }
