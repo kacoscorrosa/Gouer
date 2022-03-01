@@ -54,7 +54,7 @@ const deleteUser = async(req, res = response) => {
 
     if ( !user ) {
         return res.status(401).json({
-            msg: 'Invalid Token'
+            msg: 'Invalid ID'
         });
     }
 

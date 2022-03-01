@@ -1,5 +1,6 @@
 const Role = require('../models/role');
 const User = require('../models/user');
+const Parking = require('../models/parking');
 
 const isValidRole = async(rol = '') => {
     rol = rol.toLowerCase();
@@ -27,8 +28,28 @@ const validateUserByID = async(id = '') =>  {
     }
 }
 
+const validateParkingByID = async(id = '') =>  {
+
+    const existParkingByID = await Parking.findById(id);
+    if ( !existParkingByID ) {
+        throw new Error('Invalid ID');
+    }
+}
+
+const validateParkingByLocation = async(location = '') => {
+
+    const parkings = await Parking.findOne({ location });
+    if (parkings) {
+        return res.status(400).json({
+            msg: 'Address is already registered' 
+        });
+    }
+} 
+
 module.exports = {
     isValidRole,
     validEmail,
-    validateUserByID
+    validateUserByID,
+    validateParkingByID,
+    validateParkingByLocation
 }

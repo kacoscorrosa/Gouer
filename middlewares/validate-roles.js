@@ -37,7 +37,7 @@ const isAdminRole = async(req, res = response, next) => {
     if ( rol !== 'admin_role' ) {
 
         return res.status(401).json({
-            msg: `${ name } not authorized to delete user`
+            msg: `${ name } not authorized to do this`
         });
     }
 
