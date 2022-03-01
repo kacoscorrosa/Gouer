@@ -59,7 +59,9 @@ const googleSignIn = async (req, res = response) => {
         let user = await User.findOne({ email });
 
         if ( !user ) {
+
             const data = {
+                
                 name,
                 email,
                 password: ':p',

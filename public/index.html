@@ -23,6 +23,10 @@
          data-shape="rectangular"
          data-logo_alignment="left">
     </div>
+
+    <button class="google">
+        Signout
+    </button>
       
     <script>
 
@@ -37,11 +41,24 @@
                 },
                 body: JSON.stringify(body)
             })
-            .then( resp => resp.json() )
+            .then( r => r.json() )
             .then( resp => {
                     console.log(resp)
+                    localStorage.setItem( 'email', resp.user.email )
             })
             .catch( console.warn );
+        }
+
+        const button = document.querySelector('.google');
+        button.onclick = () => {
+
+            console.log(google.accounts.id);
+            google.accounts.id.disableAutoSelect()
+
+            google.accounts.id.revoke( localStorage.getItem( 'email' ), done => {
+                localStorage.clear();
+                location.reload();
+            });
         }
     
     </script>
