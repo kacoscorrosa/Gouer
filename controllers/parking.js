@@ -16,7 +16,7 @@ const createParking = async(req, res = response) => {
 
     const name = req.body.name.toLowerCase();
     
-    const { location, place, horary, price, rol } = req.body;
+    const { location, place, horary, price } = req.body;
 
     const parkings = await Parking.findOne({ location });
     if (parkings) {
@@ -25,7 +25,7 @@ const createParking = async(req, res = response) => {
         });
     }
 
-    const park = new Parking({ name, location, place, horary, price, rol });
+    const park = new Parking({ name, location, place, horary, price });
     
     await park.save();
     
@@ -35,15 +35,7 @@ const createParking = async(req, res = response) => {
 const updateParking = async(req, res = response) => {
 
     const { id } = req.params;
-    const { _id, rol, ...rest } = req.body;
-    const { location } = req.body;
-
-    const parkings = await Parking.findOne({ location });
-    if (parkings) {
-        return res.status(400).json({
-            msg: 'Address is already registered' 
-        });
-    }
+    const { _id, location, ...rest } = req.body;
 
     const parkingsAct = await Parking.findByIdAndUpdate(id, rest, { new: true });
 

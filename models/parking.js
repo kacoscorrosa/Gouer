@@ -14,10 +14,6 @@ const ParkingSchema = Schema({
         type: Number,
         required: [true, 'Place is required'] 
     },
-    rol: {
-        type: String,
-        default: 'admin_role'
-    },
     state: {
         type: Boolean,
         default: true

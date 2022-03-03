@@ -11,6 +11,7 @@ class Server {
         this.path = {
             auth: '/auth',
             parkingInfo: '/parkingInfo',
+            reserve: '/reserve',
             users: '/users',
         }
 
@@ -36,7 +37,8 @@ class Server {
 
     routes() {
         this.app.use(this.path.auth,         require( '../routes/auth' ));
-        this.app.use(this.path.parkingInfo,  require( '../routes/parking' ));  
+        this.app.use(this.path.parkingInfo,  require( '../routes/parking' ));
+        this.app.use(this.path.reserve,  require( '../routes/reserve' ));
         this.app.use(this.path.users,        require( '../routes/users' ));
     }
 
