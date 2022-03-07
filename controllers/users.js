@@ -1,9 +1,10 @@
 const { response } = require("express")
-const bcryptjs = require('bcryptjs');
 
 const User = require('../models/user');
 
-const getUsers = async(req, res = response) => {
+const admin = require('../database/firebase')
+
+const getUsers = async (req, res = response) => {
 
     const users = await User.find({ state: true });
 
@@ -12,57 +13,74 @@ const getUsers = async(req, res = response) => {
     });
 }
 
-const createUser = async(req, res = response) => {
+const createUser = async (req, res = response) => {
 
     const name = req.body.name.toLowerCase();
-    const rol = req.body.rol.toLowerCase();
-    
+
     const { email, password, surname } = req.body;
 
-    const user = new User({ name, email, password, rol, surname });
+    try {
+        const user = await admin.auth().createUser({
+            email,
+            password,
+            displayName: `${name} ${surname}`
+        });
 
-    const salt = bcryptjs.genSaltSync();
-    user.password = bcryptjs.hashSync(password, salt);
-    
-    await user.save();
-    
-    res.json(user);
+        const userDB = new User({ name, email, surname, provider: user.providerData[0].providerId });
+
+        await userDB.save();
+
+        res.json(userDB);
+
+    } catch (error) {
+
+        console.log(error)
+
+        res.status(400).json({
+            msg: 'No se pudo crear el usuario'
+        })
+
+    }
 }
 
-const updateUser = async(req, res = response) => {
+const updateUser = async (req, res = response) => {
 
     const { id } = req.params;
-    const { _id, password, google, email, ...rest } = req.body;
 
-    if ( password ) {
-        const salt = bcryptjs.genSaltSync();
-        rest.password = bcryptjs.hashSync(password, salt);
+    const { _id,  ...rest } = req.body;
+
+    const user = await User.findById(id)
+
+    if (!user) {
+        res.status(400).json({})
     }
 
-    const user = await User.findByIdAndUpdate(id, rest, { new: true });
+    const userDB = await User.findByIdAndUpdate(id, rest, { new: true });
 
-    res.json({
-        user
-    });
+    await admin.auth().updateUser(req.fbUid, {
+        ...rest,
+        displayName: `${req.body.name} ${req.body.surname}`
+    })
+
+    res.json(userDB)
 }
 
-const deleteUser = async(req, res = response) => {
+const deleteUser = async (req, res = response) => {
 
     const { id } = req.params;
 
-    const user = await User.findByIdAndDelete( id );
+    const user = await User.findByIdAndDelete(id);
 
-    if ( !user ) {
+    if (!user) {
         return res.status(401).json({
             msg: 'Invalid ID'
         });
     }
 
-    const userAuth = req.userAuth;
+    await admin.auth().deleteUser(req.fbUid)
 
     res.json({
-        deletedUser: user,
-        userAuth
+        msg: 'Success'
     });
 }
 

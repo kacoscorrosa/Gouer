@@ -1,13 +1,13 @@
 const { response } = require("express")
-const jwt = require('jsonwebtoken');
+const admin = require('../database/firebase')
 
 const User = require('../models/user');
 
-const validateJWT = async( req, res = response, next ) => {
+const validateJWT = async (req, res = response, next) => {
 
-    const token = req.header( 'x-token' );
+    const token = req.header('x-token');
 
-    if ( !token ) {
+    if (!token) {
         return res.status(401).json({
             msg: 'Token must be sent'
         });
@@ -15,14 +15,21 @@ const validateJWT = async( req, res = response, next ) => {
 
     try {
 
-        const { uid } = jwt.verify( token, process.env.SECRETORPRIVATEKEY );
+        const userInfo = await admin
+            .auth()
+            .verifyIdToken(token);
 
-        const user = await User.findById(uid);
+        let user = userInfo
 
-        req.userAuth = user;
-        
+        if (req.url !== '/validate') {
+            user = await User.findOne( {email: userInfo.email })
+        }
+
+        req.userAuth = user
+        req.fbUid = userInfo.uid
+
         next();
-        
+
     } catch (error) {
         console.log(error);
         res.status(401).json({

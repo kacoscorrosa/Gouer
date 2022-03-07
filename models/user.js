@@ -13,10 +13,6 @@ const UserSchema = Schema({
         required: [true, 'Email is required'],
         unique: true
     },
-    password: {
-        type: String,
-        required: [true, 'Password is required'] 
-    },
     rol: {
         type: String,
         required: true,
@@ -28,12 +24,11 @@ const UserSchema = Schema({
         default: true
     },
     suscription: {
-        type: Boolean,
-        default: false
+        type: String,
     },
-    google: {
-        type: Boolean,
-        default: false
+    provider: {
+        type: String,
+        required: true
     }
 });
 

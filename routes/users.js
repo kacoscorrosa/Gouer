@@ -28,7 +28,7 @@ router.post('/', [
     check('email', 'Invalid email').isEmail(),
     check('email').custom( validEmail ),
     check('password', 'The password must contain at least 6 digits').isLength({ min: 6 }),
-    check('rol').custom( isValidRole ),
+    // check('rol').custom( isValidRole ),
     validateFields
 ], createUser );
 

@@ -1,96 +1,41 @@
 const { response } = require("express");
-const bcryptjs = require("bcryptjs");
+
+const admin = require('../database/firebase')
 
 const User = require('../models/user');
-const { generateJWT } = require("../helpers/generateJWT");
-const { googleVerify } = require("../helpers/google-verify");
 
-const login = async (req, res = response) => {
+const validate = async (req, res = response) => {
 
-    const { email, password } = req.body;
+    const { userAuth } = req
 
-    try {
-
-        const user = await User.findOne({ email });
-
-        if (!user) {
-            return res.status(400).json({
-                msg: 'Invalid email'
-            });
-        }
-
-        if (!user.state) {
-            return res.status(400).json({
-                msg: 'inactive user'
-            });
-        }
-
-        const validPassword = bcryptjs.compareSync(password, user.password);
-        if (!validPassword) {
-            return res.status(400).json({
-                msg: 'Invalid password'
-            });
-        }
-
-        const token = await generateJWT(user.id);
-
-        res.json({
-            user,
-            token
-        });
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            msg: 'communicate with the administrator',
-            error
-        });
-    }
-}
-
-const googleSignIn = async (req, res = response) => {
-
-    const { id_token } = req.body;
+    const { sign_in_provider } = userAuth.firebase
 
     try {
 
-        const { name, picture, email } = await googleVerify( id_token );
+        if (sign_in_provider === 'password') {
 
-        let user = await User.findOne({ email });
+            const user = await User.findOne({ email: userAuth.email })
 
-        if ( !user ) {
+            if (!user) {
+                return res.status(401).json({ msg: 'wrong username/password' })
+            }
 
-            const data = {
-                
-                name,
-                email,
-                password: ':p',
-                google: true,
-            };
+            return res.json({msg: 'success!', user})
 
-            user = new User( data );
-            await user.save();
+        } else {
+            return res.status(401).json({ msg: 'wrong username/password' })
         }
 
-        const token = await generateJWT(user.id);
-
-        res.json({
-            user,
-            token
-        });
-
     } catch (error) {
-        console.log(error);
-        res.status(400).json({
-            ok: false,
-            msg:'The token could not be verified',
-            error
-        })
-
+        console.log(error)
+        return res.status(401).json({ msg: 'wrong username/password' })
     }
+
+    // -------------------------------------------------------------------------------------- //
 }
+
+
 
 module.exports = {
-    login,
-    googleSignIn
+    validate
 }

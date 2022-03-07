@@ -27,19 +27,19 @@ class Server {
     }
 
     middlewares() {
-        this.app.use( cors());
+        this.app.use(cors());
 
-        this.app.use( express.json());
+        this.app.use(express.json());
 
-        this.app.use( express.static( 'public' ));
+        this.app.use(express.static('public'));
 
     }
 
     routes() {
-        this.app.use(this.path.auth,         require( '../routes/auth' ));
-        this.app.use(this.path.parkingInfo,  require( '../routes/parking' ));
-        this.app.use(this.path.reserve,  require( '../routes/reserve' ));
-        this.app.use(this.path.users,        require( '../routes/users' ));
+        this.app.use(this.path.auth, require('../routes/auth'));
+        this.app.use(this.path.parkingInfo, require('../routes/parking'));
+        this.app.use(this.path.reserve, require('../routes/reserve'));
+        this.app.use(this.path.users, require('../routes/users'));
     }
 
     listen() {
