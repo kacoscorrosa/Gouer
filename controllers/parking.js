@@ -1,14 +1,21 @@
 const { response } = require("express")
-const bcryptjs = require('bcryptjs');
 
 const Parking = require('../models/parking');
 
 const getParkings = async(req, res = response) => {
 
-    const parking = await Parking.find();
+    const { limit, from } = req.query;
 
-    res.json({
-        parking
+    let [total, parkings] = await Promise.all([
+        Parking.count(),
+        Parking.find()
+            .skip(Number(from - 1))
+            .limit(Number(limit))
+    ]);
+    
+    res.status(200).json({
+        total,
+        parkings
     });
 }
 

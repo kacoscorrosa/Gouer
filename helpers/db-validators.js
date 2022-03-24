@@ -1,6 +1,7 @@
 const Role = require('../models/role');
 const User = require('../models/user');
 const Parking = require('../models/parking');
+const Reserve = require('../models/reserve');
 
 const isValidRole = async(rol = '') => {
     rol = rol.toLowerCase();
@@ -11,7 +12,7 @@ const isValidRole = async(rol = '') => {
     }
 }
 
-const validEmail = async(email = '') => {
+const validExistEmail = async(email = '') => {
 
     const existEmail = await User.findOne({email});
     
@@ -20,7 +21,16 @@ const validEmail = async(email = '') => {
     }
 }
 
-const validateUserByID = async(id = '') =>  {
+const validUserByEmail = async(email = '') => {
+
+    const user = await User.findOne({email});
+
+    if (!user) {
+        throw new Error('Unregistered user');
+    }
+}
+
+const validUserByID = async(id = '') =>  {
 
     const existUserByID = await User.findById(id);
     if ( !existUserByID ) {
@@ -30,8 +40,8 @@ const validateUserByID = async(id = '') =>  {
 
 const validateParkingByID = async(id = '') =>  {
 
-    const existParkingByID = await Parking.findById(id);
-    if ( !existParkingByID ) {
+    const parking = await Parking.findById(id);
+    if ( !parking ) {
         throw new Error('Invalid ID');
     }
 }
@@ -44,12 +54,23 @@ const validateParkingByLocation = async(location = '') => {
             msg: 'Address is already registered' 
         });
     }
-} 
+}
+
+const validateReserveByID = async(id = '') => {
+
+    const reserve = await Reserve.findById(id);
+
+    if ( !reserve ) {
+        throw new Error('Invalid ID');
+    }
+}
 
 module.exports = {
     isValidRole,
-    validEmail,
-    validateUserByID,
+    validExistEmail,
+    validUserByID,
     validateParkingByID,
-    validateParkingByLocation
+    validateParkingByLocation,
+    validUserByEmail,
+    validateReserveByID
 }

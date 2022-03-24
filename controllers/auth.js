@@ -1,41 +1,45 @@
 const { response } = require("express");
-
-const admin = require('../database/firebase')
+const bcryptjs = require("bcryptjs");
 
 const User = require('../models/user');
 
-const validate = async (req, res = response) => {
+const { generateJWT } = require("../helpers/generate-jwt");
 
-    const { userAuth } = req
+const login = async (req, res = response) => {
 
-    const { sign_in_provider } = userAuth.firebase
+    const email = req.body.email.toLowerCase();
+    const password = req.body.password;
 
     try {
 
-        if (sign_in_provider === 'password') {
+        const user = await User.findOne({ email });
 
-            const user = await User.findOne({ email: userAuth.email })
+        const validPassword = bcryptjs.compareSync( password, user.password );
 
-            if (!user) {
-                return res.status(401).json({ msg: 'wrong username/password' })
-            }
-
-            return res.json({msg: 'success!', user})
-
-        } else {
-            return res.status(401).json({ msg: 'wrong username/password' })
+        if ( !validPassword ) {
+            return res.status(400).json({
+                msg: 'Invalid email/password'
+            });
         }
 
-    } catch (error) {
-        console.log(error)
-        return res.status(401).json({ msg: 'wrong username/password' })
-    }
+        const token = await generateJWT(user.id);
 
-    // -------------------------------------------------------------------------------------- //
+        res.json({
+            user,
+            token
+        });
+
+    } catch (error) {
+
+        console.log(error);
+
+        return res.status(500).json({
+            msg: 'Communicate with the administrator',
+            error
+        });
+    }
 }
 
-
-
 module.exports = {
-    validate
+    login
 }

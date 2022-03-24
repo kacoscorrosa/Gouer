@@ -26,7 +26,7 @@ const UserSchema = Schema({
     suscription: {
         type: String,
     },
-    provider: {
+    password: {
         type: String,
         required: true
     }

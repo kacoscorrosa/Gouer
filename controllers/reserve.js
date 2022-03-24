@@ -1,21 +1,28 @@
-const { response } = require("express")
-const bcryptjs = require('bcryptjs');
+const { response } = require("express");
 
 const Reserve = require('../models/reserve');
-const Parking = require('../models/parking');
 
 const getReserves = async(req, res = response) => {
 
     const { id, rol, name } = req.userAuth;
+    const reserve = await Reserve.find({user: id});
+    console.log(reserve);
 
     if ( rol === 'admin_role' ) {
-        const reserve = await Reserve.find().populate('user', 'name').populate('parking', 'name location');
+
+        const reserve = await Reserve.find()
+                                .populate('user', 'name')
+                                .populate('parking', 'name location');
+
         return res.json({
             reserve
         });
 
     } else if ( rol !== 'admin_role' ) {
-        const authUserReserv = await Reserve.find({user: id}).populate('user', 'name').populate('parking', 'name location');
+
+        const authUserReserv = await Reserve.find({user: id})
+                                        .populate('user', 'name')
+                                        .populate('parking', 'name location');
 
         if (authUserReserv.length === 0) {
             return res.status(400).json({
@@ -38,14 +45,6 @@ const createReserve = async(req, res = response) => {
     
     const { parking } = req.body;
 
-    const park = await Parking.findById(parking);
-
-    if ( !park ) {
-        return res.status(400).json({
-            msg: 'Invalid ID'
-        });
-    }
-
     const data = {
         user: req.userAuth._id,
         parking,
@@ -62,13 +61,7 @@ const deleteReserve = async(req, res = response) => {
 
     const { id } = req.params;
 
-    const reserv = await Reserve.findById( id );
-
-    if ( !reserv ) {
-        return res.status(400).json({
-            msg: 'Invalid ID'
-        });
-    }
+    const reserv = await Reserve.findById(id);
 
     const userReserv = reserv.user.toString();
 

@@ -3,13 +3,9 @@ const { check } = require('express-validator');
 
 const { validateFields,
         validateJWT,
-        isAdminRole,
-        validateRoleAuth } = require('../middlewares');
+        isAdminRole } = require('../middlewares');
 
-const { isValidRole,
-        validEmail,
-        validateUserByID, 
-        validateParkingByID,
+const { validateParkingByID,
         validateParkingByLocation} = require('../helpers/db-validators');
 
 const { getParkings, createParking, updateParking, deleteParking } = require('../controllers/parking');
@@ -18,7 +14,7 @@ const router = Router();
 
 router.get('/', [
     validateJWT,
-    isAdminRole
+    validateFields
 ], getParkings );
 
 router.post('/', [
@@ -26,6 +22,7 @@ router.post('/', [
     isAdminRole,
     check('name', 'Name is requerid').not().isEmpty(),
     check('location', 'Location is requerid').not().isEmpty(),
+    check('location').custom(validateParkingByLocation),
     check('place', 'Place is requerid').not().isEmpty(),
     check('place', 'Place must be a number').isNumeric(),
     check('horary', 'Horary is requerid').not().isEmpty(),
@@ -42,7 +39,7 @@ router.put('/:id', [
 
 router.delete('/:id', [
     validateJWT,
-    validateRoleAuth,
+    isAdminRole,
     check('id', 'Invalid ID').isMongoId(),
     check('id').custom( validateParkingByID ),
     validateFields
